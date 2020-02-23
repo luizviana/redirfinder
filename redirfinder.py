@@ -3,7 +3,7 @@ import sys
 import re
 import threading
 
-PAYLOADS = ["google.com", "https%3A%2F%2Fgoogle.com", "https%3A%2F%2F%2Fgoogle.com", "%40google.com", "%3A%2F%2Fgoogle.com", "@google.com", "://google.com", "https://google.com", "https://////google.com", "https://///google.com", "https:////google.com", "https:///google.com"]
+PAYLOADS = ["google.com", "https%3A%2F%2Fgoogle.com", "https%3A%2F%2F%2F%2Fgoogle.com", "%40google.com", "%3A%2F%2Fgoogle.com", "@google.com", "://google.com", "https://google.com", "https://////google.com", "https://///google.com", "https:////google.com", "https:///google.com"]
 PAYLOADS2 = ["google.com\\", "google.com?", "google.com&", "google.com%5c", "google.com%3F", "google.com#", "google.com%23", "google.com%26", "google.com\\", "https://google.com?", "https://google.com&", "https://google.com%5c", "https://google.com%3F", "https://google.com#", "https://google.com%23", "https://google.com%26"]
 
 
@@ -22,7 +22,7 @@ def openfile(var1):
 
 
         if len(url_list) > 0:
-            print("[ ! ] Redirect Parameters Found")
+            print("[ ! ] {} Redirect Parameters Found".format(len(url_list)))
             return url_list
         else:
             print("[ - ] Redirect Parameters Not Found")
@@ -39,13 +39,13 @@ def redirect_urls(url_list):
         url_value = re.search(r'([^=&?]+)=([^&]+)', url)
 
         for payload in PAYLOADS:
-            url_to_request = url.replace(url_value.group(2), payload)
+            url_to_request = url.replace("="+url_value.group(2), "="+payload)
             urls_to_request.append(url_to_request)
 
         url_value2 = re.search(r'^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)', url)
 
         for payload in PAYLOADS2:
-            url_to_request2 = url.replace(url_value.group(2), (payload + url_value2.group(1)))
+            url_to_request2 = url.replace("="+url_value.group(2), ("="+payload + url_value2.group(1)))
             urls_to_request.append(url_to_request2)
 
     #Remove duplicates
@@ -53,16 +53,20 @@ def redirect_urls(url_list):
     return urls_to_request
 
 
-def request(url):
-    try:
-        r = requests.request("GET", url)
-        # Check redirect
-        if "://www.google.com" in r.url or "://google.com" in r.url:
-            print("[ + ] Open Redirect found:", url)
+def request():
+    global urls_to_request
+    while len(urls_to_request) > 0:
+        url = urls_to_request.pop()
+        try:
+            r = requests.request("GET", url)
+            # Check redirect
+            str_url = str(r.url)
+            if str_url.startswith("https://google.com") or "google.com" in str(r.headers) or str_url.startswith("https://www.google.com"):
+                print("[ + ] Open Redirect found:", url)
 
-    except Exception as error:
-        if "host='google.com" in str(error):
-            print("[ + ] Possible unsafe redirect detected. Check it manually:", url)
+        except Exception as error:
+            if "host='google.com" in str(error):
+                print("[ + ] Possible unsafe redirect detected. Check it manually:", url)
 
 
 def banner():
@@ -84,10 +88,9 @@ if __name__ == "__main__":
     urls = openfile(var1)
     urls_to_request = redirect_urls(urls)
 
-    while urls_to_request:
-        try:
-            for i in range(10):
-                t = threading.Thread(target=request, args=(urls_to_request.pop(),))
-                t.start()
-        except:
-            pass
+    try:
+        for i in range(10):
+            t = threading.Thread(target=request)
+            t.start()
+    except:
+        pass
