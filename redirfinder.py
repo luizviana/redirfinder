@@ -22,7 +22,7 @@ def openfile(var1):
 
 
         if len(url_list) > 0:
-            print("[ ! ] {} Redirect Parameters Found".format(len(url_list)))
+            print("[ ! ] {} Possible Redirect Parameters Found".format(len(url_list)))
             return url_list
         else:
             print("[ - ] Redirect Parameters Not Found")
