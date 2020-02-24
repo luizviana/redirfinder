@@ -78,7 +78,7 @@ def request():
 def banner():
     print("Tool by Luiz Viana - github.com/luizviana")
     print("Usage: redirfinder.py <url_list>")
-    print("URL list format: [http|https://]example.com/redirect.php?test=example.com/file.html\n")
+    print("URL list format: [http|https]://example.com/redirect.php?test=example.com/file.html\n")
 
 
 if __name__ == "__main__":
