@@ -53,7 +53,6 @@ def redirect_urls(url_list):
 
     #Remove duplicates
     urls_to_request = list(dict.fromkeys(urls_to_request))
-    print(urls_to_request)
     return urls_to_request
 
 
