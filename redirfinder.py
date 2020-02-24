@@ -67,7 +67,7 @@ def request():
             r = requests.request("GET", url)
             # Check redirect
             str_url = str(r.url)
-            if str_url.startswith("https://google.com") or "google.com" in str(r.headers) or str_url.startswith("https://www.google.com"):
+            if str_url.startswith("https://google.com") or str_url.startswith("https://www.google.com"):
                 print("[ + ] Open Redirect found:", url)
 
         except Exception as error:
