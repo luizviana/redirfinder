@@ -41,15 +41,18 @@ def redirect_urls(url_list):
         url_value2 = re.search(r'=(\/[-a-zA-Z0-9@:%_\+\.~]*)&?', url)
 
         for payload in PAYLOADS:
-            url_to_request = url.replace("="+url_value.group(1), "="+payload)
-            urls_to_request.append(url_to_request)
+            if url_value:
+                url_to_request = url.replace("="+url_value.group(1), "="+payload)
+                urls_to_request.append(url_to_request)
 
-            url_to_request2 = url.replace("="+url_value2.group(1), "="+payload)
-            urls_to_request.append(url_to_request2)
+            if url_value2:
+                url_to_request2 = url.replace("="+url_value2.group(1), "="+payload)
+                urls_to_request.append(url_to_request2)
 
         for payload in PAYLOADS2:
-            url_to_request3 = url.replace("="+url_value.group(1), ("="+payload + url_value.group(1).replace("http://", "").replace("https://", "")))
-            urls_to_request.append(url_to_request3)
+            if url_value:
+                url_to_request3 = url.replace("="+url_value.group(1), ("="+payload + url_value.group(1).replace("http://", "").replace("https://", "")))
+                urls_to_request.append(url_to_request3)
 
     #Remove duplicates
     urls_to_request = list(dict.fromkeys(urls_to_request))
